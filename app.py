@@ -36,7 +36,7 @@ def image_input(data_src):
     img_file = None
     if data_src == 'Dado de amostra':
         img_path = glob.glob('data/sample_images/*')
-        img_slider = st.slider("➤➤➤➤➤   ➤➤➤➤➤", min_value=1, max_value=len(img_path), step=1)
+        img_slider = st.slider("➤➤➤➤➤ - ➤➤➤➤➤", min_value=1, max_value=len(img_path), step=1)
         img_file = img_path[img_slider - 1]
     else:
         img_bytes = st.sidebar.file_uploader("Fazer upload de imagem", type=['png', 'jpeg', 'jpg'])
