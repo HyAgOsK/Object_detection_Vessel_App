@@ -8,7 +8,6 @@ import os
 import time
 from tracker import *
 
-
 st.set_page_config(layout="wide")
 st.markdown(
     """
