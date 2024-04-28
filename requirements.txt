@@ -26,4 +26,3 @@ psutil  # system utilization
 thop  # FLOPs computation
 streamlit
 wget
-libgl1
