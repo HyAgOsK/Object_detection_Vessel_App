@@ -10,6 +10,7 @@ from tracker import *
 import streamlit_webrtc
 from streamlit_webrtc import webrtc_streamer, VideoTransformerBase
 import numpy as np
+import math
 
 st.set_page_config(layout="wide")
 st.markdown(
@@ -85,7 +86,7 @@ def video_input(data_src):
             width = st.sidebar.number_input("Width", min_value=120, step=20, value=width)
             height = st.sidebar.number_input("Height", min_value=120, step=20, value=height)
 
-        fps = 0
+        fps = []
         class_name = 0
         st1, st2, st3, st4 = st.columns(4)
         with st1:
@@ -115,9 +116,9 @@ def video_input(data_src):
             output_img, class_name, _ = infer_image(frame)
             output.image(output_img)
             curr_time = time.time()
-            for i in (0, curr_time - prev_time < 60):
-                fps = fps + 1 / (curr_time - prev_time)
-            fps = fps/10
+            for i in (0, curr_time - prev_time >= 60):
+                fps[i] = 1 / (curr_time - prev_time)
+            fps = sum(fps)/len(fps)
             prev_time = curr_time
             st1_text.markdown(f"### **{height}**")
             st2_text.markdown(f"### **{width}**")
