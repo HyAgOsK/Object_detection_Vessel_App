@@ -7,6 +7,7 @@ import cv2
 import os
 import time
 from tracker import *
+from streamlit_webrtc import webrtc_streamer
 
 st.set_page_config(layout="wide")
 st.markdown(
@@ -127,54 +128,14 @@ def video_input(data_src):
 
 def camera_input(camera):
         
-        st.markdown("### Detecção de embarcações em tempo realamente")
-        cap = cv2.VideoCapture(camera)
-        custom_size = st.sidebar.checkbox("Tamanho customizável")
-        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        if custom_size:
-            width = st.sidebar.number_input("Width", min_value=120, step=20, value=width)
-            height = st.sidebar.number_input("Height", min_value=120, step=20, value=height)
+    st.sidebar.title("Webcam Object Detection")
 
-        fps = 0
-        class_name = "Nenhum objeto detectado"
-        st1, st2, st3, st4 = st.columns(4)
-        with st1:
-            st.markdown("## Height")
-            st1_text = st.markdown(f"{height}")
-        with st2:
-            st.markdown("## Width")
-            st2_text = st.markdown(f"{width}")
-        with st3:
-            st.markdown("## FPS")
-            st3_text = st.markdown(f"{fps}")
-        with st4:
-            st.markdown(' ## Objetos Detectados \n')
-            st4_text = st.markdown(f"{class_name}")
-
-        st.markdown("---")
-        output = st.empty()
-        prev_time = 0
-        curr_time = 0
-        
-        while True:
-            ret, frame = cap.read()
-            if not ret:
-                st.write("Não existe mais frames, fim da captura. Saíndo ....")
-                break
-            frame = cv2.resize(frame, (width, height))
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            output_img, class_name, _ = infer_image(frame)
-            output.image(output_img)
-            curr_time = time.time()
-            fps = 1 / (curr_time - prev_time)
-            prev_time = curr_time
-            st1_text.markdown(f"### **{height}**")
-            st2_text.markdown(f"### **{width}**")
-            st3_text.markdown(f"### **{fps:.2f}**")
-            st4_text.markdown(f"### **{class_name}**")
-
-        cap.release()
+    webrtc_streamer(
+        key="example",
+        video_processor_factory=lambda: MyVideoTransformer(conf, model),
+        rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
+        media_stream_constraints={"video": True, "audio": False},
+    )
 
 def infer_image(img, size=None):
     model.conf = confidence
