@@ -297,7 +297,7 @@ def main():
         elif input_option == 'video':
             video_input(data_src)
         else:  
-            camera_input(0)
+            camera_input(1)
 
 if __name__ == "__main__":
     try:
