@@ -7,6 +7,7 @@ import cv2
 import os
 import time
 from tracker import *
+import av
 from streamlit_webrtc import (
     VideoTransformerBase,
     VideoProcessorBase,
@@ -19,7 +20,9 @@ from streamlit_webrtc import (
 )
 import numpy as np
 
-RTC_CONFIGURATION = RTCConfiguration({"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]})
+RTC_CONFIGURATION = RTCConfiguration(
+    {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
+)
 
 st.set_page_config(layout="wide")
 st.markdown(
@@ -144,13 +147,12 @@ def camera_input(confidence, model):
         
     st.sidebar.title("Webcam Object Detection")
 
-    webrtc_streamer(
-        key="self",
+    webrtc_ctx = webrtc_streamer(
+        key="TEST",
         mode=WebRtcMode.SENDRECV,
-        rtc_configuration= RTC_CONFIGURATION,
-        media_stream_constraints={"video": True, "audio": True},
-        video_processor_factory=lambda: MyVideoTransformer(confidence, model),
-        sendback_audio=False,
+        rtc_configuration=RTC_CONFIGURATION,
+        media_stream_constraints={"video": True, "audio": False},
+        async_processing=True,
     )
 
 def infer_image(img, size=None):
@@ -274,18 +276,29 @@ def main():
         elif input_option == 'video':
             video_input(data_src)
         else:  
-            camera_input(confidence, model)
+            webrtc_streamer(
+                key="WYH",
+                mode=WebRtcMode.SENDRECV,
+                rtc_configuration=RTC_CONFIGURATION,
+                video_processor_factory=VideoProcessor,
+                media_stream_constraints={"video": True, "audio": False},
+                async_processing=False,
+            )
 
 
-
-class MyVideoTransformer(VideoTransformerBase):
-    def __init__(self, conf, model):
-        self.conf = conf
-        self.model = model
-
+class VideoProcessor:
     def recv(self, frame):
-        processed_image = infer_image(frame)
-        st.image(processed_image, caption='Detected Video', channels="BGR", use_column_width=True)
+        img = frame.to_ndarray(format="bgr24")
+        
+        # vision processing
+        flipped = img[:, ::-1, :]
+
+        # model processing
+        im_pil = Image.fromarray(flipped)
+        results = st.model(im_pil, size=112)
+        bbox_img = np.array(results.render()[0])
+
+        return av.VideoFrame.from_ndarray(bbox_img, format="bgr24")
 
 if __name__ == "__main__":
     try:
