@@ -7,6 +7,7 @@ import cv2
 import os
 import time
 from tracker import *
+import streamlit_webrtc
 from streamlit_webrtc import webrtc_streamer, VideoTransformerBase
 import numpy as np
 
