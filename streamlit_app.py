@@ -115,6 +115,7 @@ def video_input(data_src):
             output_img, class_name, _ = infer_image(frame)
             output.image(output_img)
             curr_time = time.time()
+            prev_time = curr_time
             fps = 1 / (curr_time - prev_time)
             st1_text.markdown(f"### **{height}**")
             st2_text.markdown(f"### **{width}**")
