@@ -116,7 +116,7 @@ def video_input(data_src):
             output.image(output_img)
             curr_time = time.time()
             prev_time = curr_time
-            if (curr_time - prev_time) < 60:
+            if (curr_time - prev_time) < 60 and (curr_time - prev_time) > 0:
                 fps = 1 / (curr_time - prev_time)
             st1_text.markdown(f"### **{height}**")
             st2_text.markdown(f"### **{width}**")
