@@ -8,7 +8,7 @@ import os
 import time
 from tracker import *
 from streamlit_webrtc import webrtc_streamer
-
+from streamlit_webrtc import webrtc_streamer, VideoTransformerBase
 st.set_page_config(layout="wide")
 st.markdown(
     """
@@ -258,7 +258,37 @@ def main():
         elif input_option == 'video':
             video_input(data_src)
         else:  
-            camera_input(0)
+            camera_input(confidence, model)
+
+
+
+class MyVideoTransformer(VideoTransformerBase):
+    def __init__(self, conf, model):
+        self.conf = conf
+        self.model = model
+
+    def recv(self, frame):
+        image = frame.to_ndarray(format="bgr24")
+        processed_image = self._display_detected_frames(image)
+        st.image(processed_image, caption='Detected Video', channels="BGR", use_column_width=True)
+
+    def _display_detected_frames(self, image):
+        orig_h, orig_w = image.shape[0:2]
+        width = 720  # Set the desired width for processing
+
+        # cv2.resize used in a forked thread may cause memory leaks
+        input = np.asarray(Image.fromarray(image).resize((width, int(width * orig_h / orig_w))))
+
+        if self.model is not None:
+            # Perform object detection using YOLO model
+            res = self.model.predict(input, conf=self.conf)
+
+            # Plot the detected objects on the video frame
+            res_plotted = res[0].plot()
+            return res_plotted
+
+        return input
+
 
 if __name__ == "__main__":
     try:
