@@ -27,5 +27,4 @@ wget
 streamlit_webrtc
 
 # problemas dependencies
-opencv-python
-libgl1
+opencv-python-headless
