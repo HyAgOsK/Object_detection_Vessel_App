@@ -7,8 +7,17 @@ import cv2
 import os
 import time
 from tracker import *
-import streamlit_webrtc
-from streamlit_webrtc import webrtc_streamer, VideoTransformerBase
+from streamlit_server_state import server_state, server_state_lock
+from streamlit_webrtc import (
+    VideoTransformerBase,
+    VideoProcessorBase,
+    WebRtcMode,
+    WebRtcStreamerContext,
+    create_mix_track,
+    create_process_track,
+    webrtc_streamer,
+)
+
 import numpy as np
 import math
 
@@ -116,9 +125,9 @@ def video_input(data_src):
             output_img, class_name, _ = infer_image(frame)
             output.image(output_img)
             curr_time = time.time()
-            for i in (0, curr_time - prev_time >= 60):
+            for i in (0, curr_time - prev_time >= 10):
                 fps = fps + 1 / (curr_time - prev_time)
-            fps = fps/60
+            fps = fps/10
             prev_time = curr_time
             st1_text.markdown(f"### **{height}**")
             st2_text.markdown(f"### **{width}**")
@@ -136,10 +145,12 @@ def camera_input(confidence, model):
     st.sidebar.title("Webcam Object Detection")
 
     webrtc_streamer(
-        key="example",
-        video_processor_factory=lambda: MyVideoTransformer(confidence, model),
+        key="self",
+        mode=WebRtcMode.SENDRECV,
         rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
-        media_stream_constraints={"video": True, "audio": False},
+        media_stream_constraints={"video": True, "audio": True},
+        video_processor_factory=lambda: MyVideoTransformer(confidence, model),
+        sendback_audio=False,
     )
 
 def infer_image(img, size=None):
