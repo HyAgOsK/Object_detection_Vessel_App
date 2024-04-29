@@ -27,4 +27,3 @@ thop  # FLOPs computation
 streamlit
 wget
 streamlit_webrtc
-libgl1
