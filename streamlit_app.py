@@ -112,9 +112,9 @@ def video_input(data_src):
                 break
             frame = cv2.resize(frame, (width, height))
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            curr_time = time.time()
             output_img, class_name, _ = infer_image(frame)
             output.image(output_img)
+            curr_time = time.time()
             prev_time = curr_time
             fps = 1 / (curr_time - prev_time)
             st1_text.markdown(f"### **{height}**")
