@@ -15,10 +15,11 @@ from streamlit_webrtc import (
     create_mix_track,
     create_process_track,
     webrtc_streamer,
+    RTCConfiguration,    
 )
-
 import numpy as np
-import math
+
+RTC_CONFIGURATION = RTCConfiguration({"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]})
 
 st.set_page_config(layout="wide")
 st.markdown(
@@ -283,8 +284,7 @@ class MyVideoTransformer(VideoTransformerBase):
         self.model = model
 
     def recv(self, frame):
-        image = frame.to_ndarray(format="bgr24")
-        processed_image = infer_image(image)
+        processed_image = infer_image(frame)
         st.image(processed_image, caption='Detected Video', channels="BGR", use_column_width=True)
 
 if __name__ == "__main__":
