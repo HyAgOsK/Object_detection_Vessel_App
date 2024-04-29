@@ -7,8 +7,9 @@ import cv2
 import os
 import time
 from tracker import *
-from streamlit_webrtc import webrtc_streamer
 from streamlit_webrtc import webrtc_streamer, VideoTransformerBase
+import numpy as np
+
 st.set_page_config(layout="wide")
 st.markdown(
     """
@@ -126,13 +127,13 @@ def video_input(data_src):
         cap.release()
 
 
-def camera_input(camera):
+def camera_input(confidence, model):
         
     st.sidebar.title("Webcam Object Detection")
 
     webrtc_streamer(
         key="example",
-        video_processor_factory=lambda: MyVideoTransformer(conf, model),
+        video_processor_factory=lambda: MyVideoTransformer(confidence, model),
         rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
         media_stream_constraints={"video": True, "audio": False},
     )
