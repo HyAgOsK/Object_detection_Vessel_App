@@ -7,7 +7,6 @@ import cv2
 import os
 import time
 from tracker import *
-from streamlit_server_state import server_state, server_state_lock
 from streamlit_webrtc import (
     VideoTransformerBase,
     VideoProcessorBase,
