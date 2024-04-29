@@ -147,7 +147,7 @@ def camera_input(confidence, model):
     webrtc_streamer(
         key="self",
         mode=WebRtcMode.SENDRECV,
-        rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
+        rtc_configuration= RTC_CONFIGURATION,
         media_stream_constraints={"video": True, "audio": True},
         video_processor_factory=lambda: MyVideoTransformer(confidence, model),
         sendback_audio=False,
