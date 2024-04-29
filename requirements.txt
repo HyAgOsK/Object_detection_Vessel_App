@@ -27,11 +27,12 @@ wget
 streamlit_webrtc
 
 # problemas dependencies
+
+libgl1
 libgl1-mesa-glx
 mesa-libGLU
 opencv-python-headless==4.8.1.78
 opencv-contrib-python==4.8.1.78
-libgl1
 ffmpeg 
 libsm6 
 libxext6
