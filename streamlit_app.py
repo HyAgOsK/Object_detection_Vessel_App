@@ -227,7 +227,23 @@ def get_user_model():
                 model_file = model_file_
 
     return model_file
-    
+
+def camera_input(confidence, model):
+    st.sidebar.title("Webcam Object Detection")
+
+    webrtc_ctx = webrtc_streamer(
+        key="webcam",
+        mode=WebRtcMode.SENDRECV,
+        rtc_configuration=RTC_CONFIGURATION,
+        media_stream_constraints={"video": True, "audio": False},
+        async_processing=True,
+    )
+
+    if webrtc_ctx.video_transformer:
+        webrtc_ctx.video_transformer.model = model
+        webrtc_ctx.video_transformer.confidence = confidence
+
+
 def main():
     global model, confidence, cfg_model_path
 
@@ -275,30 +291,8 @@ def main():
             image_input(data_src)
         elif input_option == 'video':
             video_input(data_src)
-        else:  
-            webrtc_streamer(
-                key="WYH",
-                mode=WebRtcMode.SENDRECV,
-                rtc_configuration=RTC_CONFIGURATION,
-                video_processor_factory=VideoProcessor,
-                media_stream_constraints={"video": True, "audio": False},
-                async_processing=False,
-            )
-
-
-class VideoProcessor:
-    def recv(self, frame):
-        img = frame.to_ndarray(format="bgr24")
-        
-        # vision processing
-        flipped = img[:, ::-1, :]
-
-        # model processing
-        im_pil = Image.fromarray(flipped)
-        results = st.model(im_pil, size=112)
-        bbox_img = np.array(results.render()[0])
-
-        return av.VideoFrame.from_ndarray(bbox_img, format="bgr24")
+        else:
+            camera_input(confidence, model)  
 
 if __name__ == "__main__":
     try:
