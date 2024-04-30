@@ -11,6 +11,7 @@ import av
 import logging
 from twilio.base.exceptions import TwilioRestException
 from twilio.rest import Client
+from sample_utils.download import download_file
 from streamlit_webrtc import (
     WebRtcMode,
     webrtc_streamer,
@@ -18,6 +19,7 @@ from streamlit_webrtc import (
     VideoTransformerBase,
     
 )
+from pathlib import Path
 from sample_utils.turn import get_ice_servers
 
 import numpy as np
@@ -25,6 +27,11 @@ import numpy as np
 RTC_CONFIGURATION = RTCConfiguration(
     {"iceServers": [{"urls": ["stun.l.google.com:19302"]}]}
 )
+
+HERE = Path(__file__).parent
+ROOT = HERE
+
+logger = logging.getLogger(__name__)
 
 MODEL_URL = "https://github.com/robmarkcole/object-detection-app/raw/master/model/MobileNetSSD_deploy.caffemodel"  # noqa: E501
 MODEL_LOCAL_PATH = ROOT / "./models/MobileNetSSD_deploy.caffemodel"
