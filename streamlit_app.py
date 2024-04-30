@@ -224,11 +224,19 @@ def camera_input(confidence, model):
         rtc_configuration=RTC_CONFIGURATION,
         media_stream_constraints={"video": True, "audio": False},
         async_processing=True,
+        video_processor_factory=VideoProcessor
     )
 
     if webrtc_ctx.video_processor:
         webrtc_ctx.video_processor.model = model
         webrtc_ctx.video_processor.confidence = confidence
+
+
+class VideoProcessor:
+    def recv(self, frame):                                  
+        image, class_names_result, global_ids_list = infer_image(frame)
+        return av.VideoFrame.from_ndarray(image, format='bgr24')
+
 
 def main():
     global model, confidence, cfg_model_path
