@@ -15,10 +15,9 @@ from streamlit_webrtc import (
     VideoTransformerBase
 )
 import numpy as np
-webrtc_streamer(key="example")
 
 RTC_CONFIGURATION = RTCConfiguration(
-    {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
+    {"iceServers": [{"urls": ["stun.l.google.com:19302"]}]}
 )
 
 st.set_page_config(layout="wide")
