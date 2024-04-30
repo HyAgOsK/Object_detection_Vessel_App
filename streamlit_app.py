@@ -12,6 +12,7 @@ from streamlit_webrtc import (
     WebRtcMode,
     webrtc_streamer,
     RTCConfiguration,
+    VideoTransformerBase
 )
 import numpy as np
 
@@ -211,17 +212,18 @@ def get_user_model():
     return model_file
 
 def camera_input():
-    st.sidebar.title("Webcam Object Detection")
-    webrtc_streamer(
-        key="webcam",
-        rtc_configuration=RTC_CONFIGURATION,
-    )
+    st.header("Webcam Live Feed")
+    st.write("Click on start to use webcam and detect your face emotion")
+    webrtc_streamer(key="example", mode=WebRtcMode.SENDRECV, rtc_configuration=RTC_CONFIGURATION,
+                        video_processor_factory=ProcessorCam)
 
-class VideoProcessor:
-    def recv(self, image):                                  
-        image, class_names_result, global_ids_list = infer_image(image)
-        return av.VideoFrame.from_ndarray(image, format='bgr24')
+class ProcessorCam(VideoTransformerBase):
+    def transform(self, frame):
+        img = frame.to_ndarray(format="bgr24")
 
+        detection = infer_image(img)
+        
+        return detection
 
 def main():
     global model, confidence, cfg_model_path
