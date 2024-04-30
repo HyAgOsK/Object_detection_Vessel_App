@@ -233,8 +233,8 @@ def camera_input(confidence, model):
 
 
 class VideoProcessor:
-    def recv(self, frame):                                  
-        image, class_names_result, global_ids_list = infer_image(frame)
+    def recv(self, image):                                  
+        image, class_names_result, global_ids_list = infer_image(image)
         return av.VideoFrame.from_ndarray(image, format='bgr24')
 
 
