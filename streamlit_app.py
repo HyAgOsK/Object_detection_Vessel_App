@@ -214,10 +214,7 @@ def camera_input():
     st.sidebar.title("Webcam Object Detection")
     webrtc_streamer(
         key="webcam",
-        mode=WebRtcMode.SENDRECV,
         rtc_configuration=RTC_CONFIGURATION,
-        media_stream_constraints={"video": True, "audio": False},
-        async_processing=True,
     )
 
 class VideoProcessor:
