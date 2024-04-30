@@ -29,4 +29,3 @@ streamlit_webrtc
 # problemas dependencies
 opencv-python-headless
 av
-twilio
