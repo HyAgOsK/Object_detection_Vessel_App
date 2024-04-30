@@ -212,18 +212,10 @@ def get_user_model():
     return model_file
 
 def camera_input():
-    st.header("Webcam Live Feed")
-    st.write("Click on start to use webcam and detect your face emotion")
-    webrtc_streamer(key="example", mode=WebRtcMode.SENDRECV, rtc_configuration=RTC_CONFIGURATION,
-                        video_processor_factory=ProcessorCam)
+    st.header("Detecção em tempo real")
+    st.write("Clique abaixo para inciar a detecção")
+    webrtc_streamer(key="example")
 
-class ProcessorCam(VideoTransformerBase):
-    def transform(self, frame):
-        img = frame.to_ndarray(format="bgr24")
-
-        detection = video_input(img)
-        
-        return detection
 
 def main():
     global model, confidence, cfg_model_path
