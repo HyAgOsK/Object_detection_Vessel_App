@@ -221,7 +221,7 @@ class ProcessorCam(VideoTransformerBase):
     def transform(self, frame):
         img = frame.to_ndarray(format="bgr24")
 
-        detection = infer_image(img)
+        detection = video_input(img)
         
         return detection
 
