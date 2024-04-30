@@ -226,10 +226,9 @@ def camera_input(confidence, model):
         async_processing=True,
     )
 
-    if webrtc_ctx.video_transformer:
-        webrtc_ctx.video_transformer.model = model
-        webrtc_ctx.video_transformer.confidence = confidence
-
+    if webrtc_ctx.video_processor:
+        webrtc_ctx.video_processor.model = model
+        webrtc_ctx.video_processor.confidence = confidence
 
 def main():
     global model, confidence, cfg_model_path
@@ -279,7 +278,7 @@ def main():
         elif input_option == 'video':
             video_input(data_src)
         else:
-            camera_input(confidence, model)  
+            camera_input(confidence, model) 
 
 if __name__ == "__main__":
     try:
