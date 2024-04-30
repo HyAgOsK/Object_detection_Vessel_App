@@ -19,6 +19,7 @@ from streamlit_webrtc import (
     VideoTransformerBase,
     
 )
+from typing import List, NamedTuple
 from pathlib import Path
 from sample_utils.turn import get_ice_servers
 
