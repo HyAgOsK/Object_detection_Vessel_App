@@ -142,19 +142,6 @@ def video_input(data_src):
 
         cap.release()
 
-
-def camera_input(confidence, model):
-        
-    st.sidebar.title("Webcam Object Detection")
-
-    webrtc_ctx = webrtc_streamer(
-        key="TEST",
-        mode=WebRtcMode.SENDRECV,
-        rtc_configuration=RTC_CONFIGURATION,
-        media_stream_constraints={"video": True, "audio": False},
-        async_processing=True,
-    )
-
 def infer_image(img, size=None):
     model.conf = confidence
     result = model(img, size=size) if size else model(img)
