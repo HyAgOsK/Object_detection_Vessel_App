@@ -9,14 +9,9 @@ import time
 from tracker import *
 import av
 from streamlit_webrtc import (
-    VideoTransformerBase,
-    VideoProcessorBase,
     WebRtcMode,
-    WebRtcStreamerContext,
-    create_mix_track,
-    create_process_track,
     webrtc_streamer,
-    RTCConfiguration,    
+    RTCConfiguration,
 )
 import numpy as np
 
@@ -215,22 +210,15 @@ def get_user_model():
 
     return model_file
 
-def camera_input(confidence, model):
+def camera_input():
     st.sidebar.title("Webcam Object Detection")
-
-    webrtc_ctx = webrtc_streamer(
+    webrtc_streamer(
         key="webcam",
         mode=WebRtcMode.SENDRECV,
         rtc_configuration=RTC_CONFIGURATION,
         media_stream_constraints={"video": True, "audio": False},
         async_processing=True,
-        video_processor_factory=VideoProcessor
     )
-
-    if webrtc_ctx.video_processor:
-        webrtc_ctx.video_processor.model = model
-        webrtc_ctx.video_processor.confidence = confidence
-
 
 class VideoProcessor:
     def recv(self, image):                                  
@@ -286,7 +274,7 @@ def main():
         elif input_option == 'video':
             video_input(data_src)
         else:
-            camera_input(confidence, model) 
+            camera_input() 
 
 if __name__ == "__main__":
     try:
