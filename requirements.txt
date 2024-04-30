@@ -24,8 +24,10 @@ psutil  # system utilization
 thop  # FLOPs computation
 streamlit
 wget
-streamlit_webrtc
 
 # problemas dependencies
 opencv-python-headless
 av
+pydub==0.25.1
+streamlit_webrtc==0.47.1
+twilio~=8.10.1
