@@ -24,8 +24,8 @@ psutil  # system utilization
 thop  # FLOPs computation
 streamlit
 wget
-streamlit_webrtc
 
 # problemas dependencies
 opencv-python-headless
 av
+streamlit_webrtc
