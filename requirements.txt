@@ -29,4 +29,3 @@ wget
 opencv-python-headless
 av
 streamlit_webrtc
-opencv-python
