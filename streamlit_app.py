@@ -242,7 +242,7 @@ def camera_input():
             return frame_array
 
     # Iniciar a captura de vídeo da câmera
-    with st.camera_input(label="Pressione 'Iniciar' para abrir a câmera") as video_stream:
+    with st.camera_input(label="marcha") as video_stream:
         if video_stream:
             object_detector = ObjectDetector()
 
@@ -251,7 +251,7 @@ def camera_input():
                 processed_frame = object_detector.transform(frame)
                 # Exibir o frame processado
                 st.image(processed_frame, channels="BGR")
-                
+
 
 
 def main():
