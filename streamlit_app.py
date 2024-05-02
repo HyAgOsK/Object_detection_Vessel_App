@@ -30,12 +30,7 @@ st.markdown(
 
     </style>
     """,
-    unsafe_allow_html=True
 )
-
-
-
-webrtc_streamer(key='teste')
 
 cfg_model_path = 'models/best.pt'
 model = None
