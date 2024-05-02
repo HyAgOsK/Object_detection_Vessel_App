@@ -18,7 +18,6 @@ from streamlit_webrtc import (
 import numpy as np
 
 
-webrtc_streamer(key='teste')
 
 st.set_page_config(layout="wide")
 st.markdown(
@@ -34,6 +33,9 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+
+
+webrtc_streamer(key='teste')
 
 cfg_model_path = 'models/best.pt'
 model = None
