@@ -219,10 +219,10 @@ def camera_input():
             self.model = load_model(cfg_model_path, 'cpu')
             print("Modelo carregado com sucesso.")
 
-        def transform(self, frame):
+        def recv(self, frame: av.VideoFrame) -> av.VideoFrame:
             print("Recebendo frame...")
             # Converter o frame para uma imagem
-            img = Image.fromarray(frame)
+            img = Image.fromarray(frame.to_ndarray())
             # Executar detecção de objetos
             results = self.model(img)
             # Obter as detecções
@@ -230,7 +230,7 @@ def camera_input():
             print("Detecções realizadas com sucesso.")
 
             # Converter av.VideoFrame para um array NumPy
-            frame_array = frame.copy()
+            frame_array = frame.to_ndarray(format="bgr24").copy()
 
             # Desenhar caixas delimitadoras e rótulos nas detecções
             for detection in detections:
@@ -239,19 +239,23 @@ def camera_input():
                 cv2.rectangle(frame_array, (x1, y1), (x2, y2), (0, 255, 0), 2)
                 cv2.putText(frame_array, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
-            return frame_array
+            # Converter o frame de volta para av.VideoFrame
+            annotated_frame = av.VideoFrame.from_ndarray(frame_array, format="bgr24")
+            print("Frame anotado criado com sucesso.")
+
+            return annotated_frame
 
     # Iniciar a captura de vídeo da câmera
-    with st.camera_input(label='Detecção em tempo real', key='teste') as video_stream:
-        if video_stream:
-            object_detector = ObjectDetector()
+    video_stream = st.camera_input(label="Pressione 'Iniciar' para abrir a câmera")
 
-            for frame in video_stream:
-                # Realizar a detecção de objetos em cada frame
-                processed_frame = object_detector.transform(frame)
-                # Exibir o frame processado
-                st.image(processed_frame, channels="BGR")
+    # Verificar se a captura de vídeo foi iniciada
+    if video_stream:
+        object_detector = ObjectDetector()
 
+        while True:
+            frame = video_stream.read()  # Ler o próximo frame
+            annotated_frame = object_detector.recv(frame)  # Processar o frame
+            video_stream.write(annotated_frame)  # Exibir o frame processado
 
 
 def main():
