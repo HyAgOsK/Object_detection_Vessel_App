@@ -221,50 +221,45 @@ def camera_input():
 
         def recv(self, frame: av.VideoFrame) -> av.VideoFrame:
             print("Recebendo frame...")
-            if isinstance(frame, av.VideoFrame):
-                # Verificar se o frame é uma instância de av.VideoFrame
-                img = Image.fromarray(frame.to_ndarray())
-                # Executar detecção de objetos
-                results = self.model(img)
-                # Obter as detecções
-                detections = results.xyxy[0]
-                print("Detecções realizadas com sucesso.")
+            # Converter o frame para uma imagem
+            img = Image.fromarray(frame.to_ndarray())
+            # Executar detecção de objetos
+            results = self.model(img)
+            # Obter as detecções
+            detections = results.xyxy[0]
+            print("Detecções realizadas com sucesso.")
 
-                # Converter av.VideoFrame para um array NumPy
-                frame_array = frame.to_ndarray(format="bgr24").copy()
+            # Converter av.VideoFrame para um array NumPy
+            frame_array = frame.to_ndarray(format="bgr24").copy()
 
-                # Desenhar caixas delimitadoras e rótulos nas detecções
-                for detection in detections:
-                    x1, y1, x2, y2, conf, class_id = [int(coord) for coord in detection[:6]]
-                    label = f"{self.model.names[class_id]}: {conf:.2f}"
-                    cv2.rectangle(frame_array, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                    cv2.putText(frame_array, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+            # Desenhar caixas delimitadoras e rótulos nas detecções
+            for detection in detections:
+                x1, y1, x2, y2, conf, class_id = [int(coord) for coord in detection[:6]]
+                label = f"{self.model.names[class_id]}: {conf:.2f}"
+                cv2.rectangle(frame_array, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                cv2.putText(frame_array, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
-                # Converter o frame de volta para av.VideoFrame
-                annotated_frame = av.VideoFrame.from_ndarray(frame_array, format="bgr24")
-                print("Frame anotado criado com sucesso.")
+            # Converter o frame de volta para av.VideoFrame
+            annotated_frame = av.VideoFrame.from_ndarray(frame_array, format="bgr24")
+            print("Frame anotado criado com sucesso.")
 
-                return annotated_frame
-            else:
-                # Se o frame não for uma instância de av.VideoFrame, retornar None
-                return None
+            return annotated_frame
 
-    # Iniciar a captura de vídeo da câmera
-    video_stream = st.camera_input(label="Pressione 'Iniciar' para abrir a câmera")
+    # Iniciar o stream WebRTC
+    print("Iniciando o stream WebRTC...")
+    webrtc_streamer(
+        key="object-detection",
+        mode=WebRtcMode.SENDRECV,
+        rtc_configuration={
+            "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
+        },
+        media_stream_constraints={
+            "video": True,
+            "audio": False,
+        },
+        video_processor_factory=ObjectDetector,
+    )
 
-    # Verificar se a captura de vídeo foi iniciada
-    if video_stream:
-        object_detector = ObjectDetector()
-
-        while True:
-            frame = video_stream.read()  # Ler o próximo frame
-            if isinstance(frame, bytes):
-                # Se o frame for do tipo bytes, tentar decodificá-lo
-                container = av.open(frame, format='bgr24')
-                frame = next(container.decode(video=0))
-            annotated_frame = object_detector.recv(frame)  # Processar o frame
-            if annotated_frame:
-                video_stream.write(annotated_frame)  # Exibir o frame processado
 
 def main():
     global model, confidence, cfg_model_path
