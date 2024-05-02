@@ -260,12 +260,11 @@ def camera_input():
             frame = video_stream.read()  # Ler o próximo frame
             if isinstance(frame, bytes):
                 # Se o frame for do tipo bytes, tentar decodificá-lo
-                frame = av.VideoFrame.from_ndarray(frame, format="bgr24")
+                container = av.open(frame, format='bgr24')
+                frame = next(container.decode(video=0))
             annotated_frame = object_detector.recv(frame)  # Processar o frame
             if annotated_frame:
                 video_stream.write(annotated_frame)  # Exibir o frame processado
-
-
 
 def main():
     global model, confidence, cfg_model_path
