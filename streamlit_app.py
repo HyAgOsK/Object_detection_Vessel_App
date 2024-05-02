@@ -211,12 +211,16 @@ def camera_input():
 
     class ObjectDetector(VideoTransformerBase):
         def __init__(self):
+            print("Inicializando o detector de objetos...")
             self.model = load_model(cfg_model_path, 'cpu')  # Carregar o modelo YOLOv5
+            print("Modelo carregado com sucesso.")
 
         def recv(self, frame: av.VideoFrame) -> av.VideoFrame:
+            print("Recebendo frame...")
             img = Image.fromarray(frame.to_ndarray())  # Converter o frame para uma imagem
             results = self.model(img)  # Executar detecção de objetos
             detections = results.xyxy[0]  # Obter as detecções
+            print("Detecções realizadas com sucesso.")
 
             # Converter av.VideoFrame para um array NumPy
             frame_array = frame.to_ndarray(format="bgr24").copy()
@@ -230,9 +234,11 @@ def camera_input():
 
             # Converter o frame de volta para av.VideoFrame
             annotated_frame = av.VideoFrame.from_ndarray(frame_array, format="bgr24")
+            print("Frame anotado criado com sucesso.")
             return annotated_frame
 
     # Iniciar o stream WebRTC
+    print("Iniciando o stream WebRTC...")
     webrtc_streamer(
         key="object-detection",
         mode=WebRtcMode.SENDRECV,
