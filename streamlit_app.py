@@ -33,6 +33,8 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+st.camera_input('label', key=None, help=None, on_change=None, args=None, kwargs=None, disabled=False, label_visibility="visible")
+
 cfg_model_path = 'models/best.pt'
 model = None
 confidence = .25
@@ -236,7 +238,7 @@ def camera_input():
             # Converter o frame de volta para av.VideoFrame
             annotated_frame = av.VideoFrame.from_ndarray(frame_array, format="bgr24")
             print("Frame anotado criado com sucesso.")
-            
+
             return annotated_frame
 
     # Iniciar o stream WebRTC
