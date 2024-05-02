@@ -16,10 +16,6 @@ from streamlit_webrtc import (
 )
 import numpy as np
 
-RTC_CONFIGURATION = RTCConfiguration(
-    {"iceServers": [{"urls": ["stun.l.google.com:19302"]}]}
-)
-
 st.set_page_config(layout="wide")
 st.markdown(
     """
