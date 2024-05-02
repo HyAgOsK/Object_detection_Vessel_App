@@ -10,6 +10,7 @@ from tracker import *
 import av
 from streamlit_webrtc import (
     WebRtcMode,
+    ClientSettings,
     webrtc_streamer,
     RTCConfiguration,
     VideoTransformerBase
@@ -206,9 +207,44 @@ def get_user_model():
 
 def camera_input():
     st.header("Detecção em tempo real")
-    st.write("Clique abaixo para inciar a detecção")
-    webrtc_streamer(key="example")
+    st.write("Clique abaixo para iniciar a detecção")
 
+    class ObjectDetector(VideoTransformerBase):
+        def __init__(self):
+            self.model = load_model(cfg_model_path, 'cpu')  # Carregar o modelo YOLOv5
+
+        def recv(self, frame: av.VideoFrame) -> av.VideoFrame:
+            img = Image.fromarray(frame.to_ndarray())  # Converter o frame para uma imagem
+            results = self.model(img)  # Executar detecção de objetos
+            detections = results.xyxy[0]  # Obter as detecções
+
+            # Converter av.VideoFrame para um array NumPy
+            frame_array = frame.to_ndarray(format="bgr24").copy()
+
+            # Desenhar caixas delimitadoras e rótulos nas detecções
+            for detection in detections:
+                x1, y1, x2, y2, conf, class_id = [int(coord) for coord in detection[:6]]
+                label = f"{self.model.names[class_id]}: {conf:.2f}"
+                cv2.rectangle(frame_array, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                cv2.putText(frame_array, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+
+            # Converter o frame de volta para av.VideoFrame
+            annotated_frame = av.VideoFrame.from_ndarray(frame_array, format="bgr24")
+            return annotated_frame
+
+    # Iniciar o stream WebRTC
+    webrtc_streamer(
+        key="object-detection",
+        mode=WebRtcMode.SENDRECV,
+        rtc_configuration={
+            "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
+        },
+        media_stream_constraints={
+            "video": True,
+            "audio": False,
+        },
+        video_processor_factory=ObjectDetector,
+    )
 
 def main():
     global model, confidence, cfg_model_path
