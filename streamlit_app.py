@@ -204,8 +204,6 @@ def get_user_model():
 
     return model_file
 
-
-@st.cache_resource
 def camera_input():
     st.header("Detecção em tempo real")
     st.write("Clique abaixo para inciar a detecção")
