@@ -242,7 +242,7 @@ def camera_input():
             return frame_array
 
     # Iniciar a captura de vídeo da câmera
-    with st.camera_input() as video_stream:
+    with st.camera_input(label='Detecção em tempo real', key='teste') as video_stream:
         if video_stream:
             object_detector = ObjectDetector()
 
