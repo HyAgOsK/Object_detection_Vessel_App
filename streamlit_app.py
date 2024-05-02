@@ -219,10 +219,10 @@ def camera_input():
             self.model = load_model(cfg_model_path, 'cpu')
             print("Modelo carregado com sucesso.")
 
-        def recv(self, frame: av.VideoFrame) -> av.VideoFrame:
+        def transform(self, frame):
             print("Recebendo frame...")
             # Converter o frame para uma imagem
-            img = Image.fromarray(frame.to_ndarray())
+            img = Image.fromarray(frame)
             # Executar detecção de objetos
             results = self.model(img)
             # Obter as detecções
@@ -230,7 +230,7 @@ def camera_input():
             print("Detecções realizadas com sucesso.")
 
             # Converter av.VideoFrame para um array NumPy
-            frame_array = frame.to_ndarray(format="bgr24").copy()
+            frame_array = frame.copy()
 
             # Desenhar caixas delimitadoras e rótulos nas detecções
             for detection in detections:
@@ -239,26 +239,18 @@ def camera_input():
                 cv2.rectangle(frame_array, (x1, y1), (x2, y2), (0, 255, 0), 2)
                 cv2.putText(frame_array, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
-            # Converter o frame de volta para av.VideoFrame
-            annotated_frame = av.VideoFrame.from_ndarray(frame_array, format="bgr24")
-            print("Frame anotado criado com sucesso.")
+            return frame_array
 
-            return annotated_frame
+    # Iniciar a captura de vídeo da câmera
+    with st.camera_input(label="Pressione 'Iniciar' para abrir a câmera") as video_stream:
+        if video_stream:
+            object_detector = ObjectDetector()
 
-    # Iniciar o stream WebRTC
-    print("Iniciando o stream WebRTC...")
-    webrtc_streamer(
-        key="object-detection",
-        mode=WebRtcMode.SENDRECV,
-        rtc_configuration={
-            "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
-        },
-        media_stream_constraints={
-            "video": True,
-            "audio": False,
-        },
-        video_processor_factory=ObjectDetector,
-    )
+            for frame in video_stream:
+                # Realizar a detecção de objetos em cada frame
+                processed_frame = object_detector.transform(frame)
+                # Exibir o frame processado
+                st.image(processed_frame, channels="BGR")
 
 
 def main():
