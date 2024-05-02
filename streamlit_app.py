@@ -8,6 +8,7 @@ import os
 import time
 from tracker import *
 import av
+
 from streamlit_webrtc import (
     WebRtcMode,
     ClientSettings,
@@ -33,7 +34,6 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.camera_input('label', key=None, help=None, on_change=None, args=None, kwargs=None, disabled=False, label_visibility="visible")
 
 cfg_model_path = 'models/best.pt'
 model = None
@@ -215,14 +215,18 @@ def camera_input():
     class ObjectDetector(VideoTransformerBase):
         def __init__(self):
             print("Inicializando o detector de objetos...")
-            self.model = load_model(cfg_model_path, 'cpu')  # Carregar o modelo YOLOv5
+            # Carregar o modelo YOLO
+            self.model = load_model(cfg_model_path, 'cpu')
             print("Modelo carregado com sucesso.")
 
         def recv(self, frame: av.VideoFrame) -> av.VideoFrame:
             print("Recebendo frame...")
-            img = Image.fromarray(frame.to_ndarray())  # Converter o frame para uma imagem
-            results = self.model(img)  # Executar detecção de objetos
-            detections = results.xyxy[0]  # Obter as detecções
+            # Converter o frame para uma imagem
+            img = Image.fromarray(frame.to_ndarray())
+            # Executar detecção de objetos
+            results = self.model(img)
+            # Obter as detecções
+            detections = results.xyxy[0]
             print("Detecções realizadas com sucesso.")
 
             # Converter av.VideoFrame para um array NumPy
@@ -255,6 +259,7 @@ def camera_input():
         },
         video_processor_factory=ObjectDetector,
     )
+
 
 def main():
     global model, confidence, cfg_model_path
