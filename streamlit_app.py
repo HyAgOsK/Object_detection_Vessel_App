@@ -17,6 +17,9 @@ from streamlit_webrtc import (
 )
 import numpy as np
 
+
+webrtc_streamer(key='teste')
+
 st.set_page_config(layout="wide")
 st.markdown(
     """
