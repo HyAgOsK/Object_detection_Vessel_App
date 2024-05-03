@@ -209,11 +209,6 @@ def get_user_model():
     return model_file
 
 def camera_input():
-    # Inicializar o detector de objetos
-    object_detector = ObjectDetector()
-
-    # Inicializar o rastreador de objetos
-    tracker = ObjectTracker()
 
     # Inicializar a lista de IDs globais
     global_ids_list = []
@@ -228,7 +223,7 @@ def camera_input():
                 st.write("Recebendo frame")
                 
                 # Realizar a detecção de objetos em cada frame
-                processed_frame, class_name_result, global_ids_list = infer_image(object_detector, frame, tracker, global_ids_list)
+                processed_frame, class_name_result, global_ids_list = infer_image(frame)
                 
                 # Exibir o frame processado
                 st.image(processed_frame, channels="BGR")
