@@ -219,17 +219,6 @@ def camera_input():
             # Carregar o modelo YOLO
             self.model = load_model(cfg_model_path, 'cpu')
             print("Modelo carregado com sucesso.")
-        
-        def transform(self, frame):
-            print("Recebendo frame...")
-            #enviando para infer image
-            #frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            output_img, class_name, _ = infer_image(frame)
-            output.image(output_img)
-            curr_time = time.time()
-            fps = 1 / (curr_time - prev_time)
-            prev_time = curr_time
-            return output
 
     # Iniciar a captura de vídeo da câmera
     with st.camera_input(label="detecção em tempo real") as video_stream:
@@ -238,9 +227,10 @@ def camera_input():
 
             for frame in video_stream:
                 # Realizar a detecção de objetos em cada frame
-                processed_frame = object_detector.transform(frame)
+                processed_frame, class_name, _ = infer_image(frame)
                 # Exibir o frame processado
                 st.image(processed_frame, channels="BGR")
+                st.text(class_name)
 
 
 def main():
