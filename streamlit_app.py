@@ -209,35 +209,30 @@ def get_user_model():
     return model_file
 
 def camera_input():
-    st.header("Detecção em tempo real")
-    st.write("Clique abaixo para iniciar a detecção")
+    # Inicializar o detector de objetos
+    object_detector = ObjectDetector()
 
-    output = st.empty()
-    class ObjectDetector(VideoTransformerBase):
-        def __init__(self):
-            print("Inicializando o detector de objetos...")
-            # Carregar o modelo YOLO
-            self.model = load_model(cfg_model_path, 'cpu')
-            print("Modelo carregado com sucesso.")
+    # Inicializar o rastreador de objetos
+    tracker = ObjectTracker()
+
+    # Inicializar a lista de IDs globais
+    global_ids_list = []
 
     # Iniciar a captura de vídeo da câmera
     with st.camera_input(label="detecção em tempo real") as video_stream:
-        print("Câmera iniciada")
         if video_stream:
-            object_detector = ObjectDetector()
-
+            st.write("Câmera iniciada")
+            
+            # Loop para processar os frames da câmera
             for frame in video_stream:
-                # Converter o frame para um array numpy
-                frame_np = np.array(frame)
+                st.write("Recebendo frame")
                 
                 # Realizar a detecção de objetos em cada frame
-                processed_frame, class_name, _ = infer_image(frame_np)
+                processed_frame, class_name_result, global_ids_list = infer_image(object_detector, frame, tracker, global_ids_list)
                 
                 # Exibir o frame processado
                 st.image(processed_frame, channels="BGR")
-                st.text(class_name)
-        else:
-            print("Erro ao iniciar a câmera")
+                st.text(class_name_result)
 
 def main():
     global model, confidence, cfg_model_path
