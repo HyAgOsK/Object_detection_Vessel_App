@@ -227,16 +227,17 @@ def camera_input():
             object_detector = ObjectDetector()
 
             for frame in video_stream:
-                print("Recebendo frame")
+                # Converter o frame para um array numpy
+                frame_np = np.array(frame)
+                
                 # Realizar a detecção de objetos em cada frame
-                processed_frame, class_name, _ = infer_image(frame)
+                processed_frame, class_name, _ = infer_image(frame_np)
+                
                 # Exibir o frame processado
                 st.image(processed_frame, channels="BGR")
                 st.text(class_name)
         else:
             print("Erro ao iniciar a câmera")
-
-
 
 def main():
     global model, confidence, cfg_model_path
