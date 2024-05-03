@@ -227,20 +227,23 @@ def camera_input():
 
     object_detector = ObjectDetector()
 
-    with st.camera_input(label="detecção em tempo real") as video_stream:
-        if video_stream:
-            while True:
-                frame = video_stream.read()
-                if frame is None:
-                    st.error("Erro ao capturar o frame da webcam.")
-                    break
+    video_stream = st.camera_input(label="detecção em tempo real")
+    if video_stream is not None:
+        while True:
+            frame = video_stream.read()
+            if frame is None:
+                st.error("Erro ao capturar o frame da webcam.")
+                break
 
-                # Realizar a detecção de objetos em cada frame
-                object_detector.transform(frame)
+            # Realizar a detecção de objetos em cada frame
+            object_detector.transform(frame)
 
-                # Esperar 10 milissegundos entre os frames
-                if cv2.waitKey(10) & 0xFF == ord('q'):
-                    break
+            # Esperar 10 milissegundos entre os frames
+            if cv2.waitKey(10) & 0xFF == ord('q'):
+                break
+    else:
+        st.error("Erro ao acessar a câmera.")
+
 
 def main():
     global model, confidence, cfg_model_path
