@@ -223,7 +223,8 @@ def camera_input():
 
         def transform(self, frame):
             # Converter o frame para o formato correto (RGB)
-            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            img_pil = Image.fromarray(frame)
+            frame_rgb = np.array(img_pil.convert("RGB"))
             # Executar detecção de objetos
             img, class_name, _ = infer_image(frame_rgb)
             # Exibir o frame processado
@@ -238,8 +239,6 @@ def camera_input():
             for frame in video_stream:
                 # Realizar a detecção de objetos em cada frame
                 object_detector.transform(frame)
-
-
 def main():
     global model, confidence, cfg_model_path
 
