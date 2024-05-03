@@ -211,26 +211,13 @@ def get_user_model():
 def camera_input():
     st.header("Detecção em tempo real")
     st.write("Clique abaixo para iniciar a detecção")
-
-    output = st.empty()
-    class ObjectDetector(VideoTransformerBase):
-        def __init__(self):
-            print("Inicializando o detector de objetos...")
-            # Carregar o modelo YOLO
-            self.model = load_model(cfg_model_path, 'cpu')
-            print("Modelo carregado com sucesso.")
-
     # Iniciar a captura de vídeo da câmera
     with st.camera_input(label="detecção em tempo real") as video_stream:
         if video_stream:
-            object_detector = ObjectDetector()
+            frame, class_name = infer_image(video_stream)
 
-            for frame in video_stream:
-                # Realizar a detecção de objetos em cada frame
-                processed_frame, class_name, _ = infer_image(frame)
-                # Exibir o frame processado
-                st.image(processed_frame, channels="BGR")
-                st.text(class_name)
+            st.image(frame, channels="BGR")
+            st.text(class_name)
 
 
 def main():
