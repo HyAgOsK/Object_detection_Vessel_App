@@ -210,35 +210,53 @@ def get_user_model():
 
 def camera_input():
     st.header("Detecção em tempo real")
-    st.write("Clique abaixo para iniciar a detecção")
+    st.write("Carregue um vídeo abaixo para iniciar a detecção")
 
-    output = st.empty()
+    video_file = st.file_uploader("Carregar vídeo", type=['mp4', 'mov', 'avi'])
+    if video_file is not None:
+        video_bytes = video_file.read()
+        video_array = np.asarray(bytearray(video_bytes), dtype=np.uint8)
+        cap = cv2.VideoCapture(video_array)
 
-    class ObjectDetector(VideoTransformerBase):
-        def __init__(self):
-            print("Inicializando o detector de objetos...")
-            # Carregar o modelo YOLO
-            self.model = load_model(cfg_model_path, 'cpu')
-            print("Modelo carregado com sucesso.")
+        if not cap.isOpened():
+            st.error("Erro ao abrir o vídeo. Verifique se o arquivo é válido.")
+            return
 
-        def transform(self, frame):
-            # Converter o frame para o formato correto (RGB)
-            img_pil = Image.fromarray(frame)
-            frame_rgb = np.array(img_pil.convert("RGB"))
-            # Executar detecção de objetos
-            img, class_name, _ = infer_image(frame_rgb)
-            # Exibir o frame processado
-            output.image(img, channels="BGR")
-            st.text(class_name)
+        output = st.empty()
 
-    # Iniciar a captura de vídeo da câmera
-    with st.camera_input(label="detecção em tempo real") as video_stream:
-        if video_stream:
-            object_detector = ObjectDetector()
+        class ObjectDetector(VideoTransformerBase):
+            def __init__(self):
+                print("Inicializando o detector de objetos...")
+                # Carregar o modelo YOLO
+                self.model = load_model(cfg_model_path, 'cpu')
+                print("Modelo carregado com sucesso.")
 
-            for frame in video_stream:
-                # Realizar a detecção de objetos em cada frame
-                object_detector.transform(frame)
+            def transform(self, frame):
+                # Executar detecção de objetos
+                img, class_name, _ = infer_image(frame)
+                # Exibir o frame processado
+                output.image(img, channels="BGR")
+                st.text(class_name)
+
+        object_detector = ObjectDetector()
+
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                st.error("Erro ao ler o frame do vídeo.")
+                break
+
+            # Realizar a detecção de objetos em cada frame
+            object_detector.transform(frame)
+
+            # Esperar 10 milissegundos entre os frames
+            if cv2.waitKey(10) & 0xFF == ord('q'):
+                break
+
+        # Liberar o objeto de captura e fechar a janela OpenCV
+        cap.release()
+        cv2.destroyAllWindows()
+
 def main():
     global model, confidence, cfg_model_path
 
