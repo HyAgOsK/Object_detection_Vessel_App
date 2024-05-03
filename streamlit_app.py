@@ -208,49 +208,48 @@ def get_user_model():
 
     return model_file
 
+
+class ObjectDetector(VideoTransformerBase):
+    def __init__(self):
+        print("Inicializando o detector de objetos...")
+        # Carregar o modelo YOLO
+        self.model = load_model(cfg_model_path, 'cpu')
+        print("Modelo carregado com sucesso.")
+
+    def transform(self, frame):
+        print("Recebendo frame...")
+        # Converter o frame para uma imagem
+        img = Image.fromarray(frame)
+        # Executar detecção de objetos
+        results = self.model(img)
+        # Obter as detecções
+        detections = results.xyxy[0]
+        print("Detecções realizadas com sucesso.")
+
+        # Converter av.VideoFrame para um array NumPy
+        frame_array = frame.copy()
+
+        # Desenhar caixas delimitadoras e rótulos nas detecções
+        for detection in detections:
+            x1, y1, x2, y2, conf, class_id = [int(coord) for coord in detection[:6]]
+            label = f"{self.model.names[class_id]}: {conf:.2f}"
+            cv2.rectangle(frame_array, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            cv2.putText(frame_array, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+
+        return frame_array
+
 def camera_input():
     st.header("Detecção em tempo real")
     st.write("Clique abaixo para iniciar a detecção")
 
-    class ObjectDetector(VideoTransformerBase):
-        def __init__(self):
-            print("Inicializando o detector de objetos...")
-            # Carregar o modelo YOLO
-            self.model = load_model(cfg_model_path, 'cpu')
-            print("Modelo carregado com sucesso.")
-
-        def transform(self, frame):
-            print("Recebendo frame...")
-            # Converter o frame para uma imagem
-            img = Image.fromarray(frame)
-            # Executar detecção de objetos
-            results = self.model(img)
-            # Obter as detecções
-            detections = results.xyxy[0]
-            print("Detecções realizadas com sucesso.")
-
-            # Converter av.VideoFrame para um array NumPy
-            frame_array = frame.copy()
-
-            # Desenhar caixas delimitadoras e rótulos nas detecções
-            for detection in detections:
-                x1, y1, x2, y2, conf, class_id = [int(coord) for coord in detection[:6]]
-                label = f"{self.model.names[class_id]}: {conf:.2f}"
-                cv2.rectangle(frame_array, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                cv2.putText(frame_array, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-
-            return frame_array
-
-    # Iniciar a captura de vídeo da câmera
-    with st.camera_input(label="Pressione 'Iniciar' para abrir a câmera") as video_stream:
-        if video_stream:
-            object_detector = ObjectDetector()
-
-            for frame in video_stream:
-                # Realizar a detecção de objetos em cada frame
-                processed_frame = object_detector.transform(frame)
-                # Exibir o frame processado
-                st.image(processed_frame, channels="BGR")
+    # Iniciar o stream WebRTC
+    webrtc_streamer(
+        key="object-detection",
+        mode=WebRtcMode.SENDRECV,
+        rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
+        media_stream_constraints={"video": True, "audio": False},
+        video_processor_factory=ObjectDetector,
+    )
 
 
 def main():
@@ -301,7 +300,10 @@ def main():
         elif input_option == 'video':
             video_input(data_src)
         else:
-            camera_input() 
+            # Executa a função camera_input quando o botão é clicado
+            if st.button("Abrir Câmera"):
+                camera_input()
+
 
 if __name__ == "__main__":
     try:
