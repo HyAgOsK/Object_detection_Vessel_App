@@ -210,7 +210,9 @@ def get_user_model():
 
 def camera_input():
     st.header("Detecção em tempo real")
+    st.write("Clique abaixo para iniciar a detecção")
 
+    output = st.empty()
     class ObjectDetector(VideoTransformerBase):
         def __init__(self):
             print("Inicializando o detector de objetos...")
@@ -218,31 +220,22 @@ def camera_input():
             self.model = load_model(cfg_model_path, 'cpu')
             print("Modelo carregado com sucesso.")
 
-        def transform(self, frame):
-            # Executar detecção de objetos
-            img, class_name, _ = infer_image(frame)
-            # Exibir o frame processado
-            st.image(img, channels="BGR")
-            st.text(class_name)
+    # Iniciar a captura de vídeo da câmera
+    with st.camera_input(label="detecção em tempo real") as video_stream:
+        print("Câmera iniciada")
+        if video_stream:
+            object_detector = ObjectDetector()
 
-    object_detector = ObjectDetector()
+            for frame in video_stream:
+                print("Recebendo frame")
+                # Realizar a detecção de objetos em cada frame
+                processed_frame, class_name, _ = infer_image(frame)
+                # Exibir o frame processado
+                st.image(processed_frame, channels="BGR")
+                st.text(class_name)
+        else:
+            print("Erro ao iniciar a câmera")
 
-    video_stream = st.camera_input(label="detecção em tempo real")
-    if video_stream is not None:
-        while True:
-            frame = video_stream.read()
-            if frame is None:
-                st.error("Erro ao capturar o frame da webcam.")
-                break
-
-            # Realizar a detecção de objetos em cada frame
-            object_detector.transform(frame)
-
-            # Esperar 10 milissegundos entre os frames
-            if cv2.waitKey(10) & 0xFF == ord('q'):
-                break
-    else:
-        st.error("Erro ao acessar a câmera.")
 
 
 def main():
