@@ -223,7 +223,7 @@ def camera_input():
         def transform(self, frame):
             print("Recebendo frame...")
             #enviando para infer image
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            #frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             output_img, class_name, _ = infer_image(frame)
             output.image(output_img)
             curr_time = time.time()
