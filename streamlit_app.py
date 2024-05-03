@@ -210,52 +210,48 @@ def get_user_model():
 
 def camera_input():
     st.header("Detecção em tempo real")
-    st.write("Carregue um vídeo abaixo para iniciar a detecção")
 
-    video_file = st.file_uploader("Carregar vídeo", type=['mp4', 'mov', 'avi'])
-    if video_file is not None:
-        video_bytes = video_file.read()
-        video_array = np.asarray(bytearray(video_bytes), dtype=np.uint8)
-        cap = cv2.VideoCapture(video_array)
+    cap = cv2.VideoCapture(0)  # Abrir a webcam
 
-        if not cap.isOpened():
-            st.error("Erro ao abrir o vídeo. Verifique se o arquivo é válido.")
-            return
+    if not cap.isOpened():
+        st.error("Erro ao abrir a webcam. Verifique se está conectada corretamente.")
+        return
 
-        output = st.empty()
+    output = st.empty()
 
-        class ObjectDetector(VideoTransformerBase):
-            def __init__(self):
-                print("Inicializando o detector de objetos...")
-                # Carregar o modelo YOLO
-                self.model = load_model(cfg_model_path, 'cpu')
-                print("Modelo carregado com sucesso.")
+    class ObjectDetector(VideoTransformerBase):
+        def __init__(self):
+            print("Inicializando o detector de objetos...")
+            # Carregar o modelo YOLO
+            self.model = load_model(cfg_model_path, 'cpu')
+            print("Modelo carregado com sucesso.")
 
-            def transform(self, frame):
-                # Executar detecção de objetos
-                img, class_name, _ = infer_image(frame)
-                # Exibir o frame processado
-                output.image(img, channels="BGR")
-                st.text(class_name)
+        def transform(self, frame):
+            # Executar detecção de objetos
+            img, class_name, _ = infer_image(frame)
+            # Exibir o frame processado
+            output.image(img, channels="BGR")
+            st.text(class_name)
 
-        object_detector = ObjectDetector()
+    object_detector = ObjectDetector()
 
-        while True:
-            ret, frame = cap.read()
-            if not ret:
-                st.error("Erro ao ler o frame do vídeo.")
-                break
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            st.error("Erro ao capturar o frame da webcam.")
+            break
 
-            # Realizar a detecção de objetos em cada frame
-            object_detector.transform(frame)
+        # Realizar a detecção de objetos em cada frame
+        object_detector.transform(frame)
 
-            # Esperar 10 milissegundos entre os frames
-            if cv2.waitKey(10) & 0xFF == ord('q'):
-                break
+        # Esperar 10 milissegundos entre os frames
+        if cv2.waitKey(10) & 0xFF == ord('q'):
+            break
 
-        # Liberar o objeto de captura e fechar a janela OpenCV
-        cap.release()
-        cv2.destroyAllWindows()
+    # Liberar o objeto de captura e fechar a janela OpenCV
+    cap.release()
+    cv2.destroyAllWindows()
+
 
 def main():
     global model, confidence, cfg_model_path
