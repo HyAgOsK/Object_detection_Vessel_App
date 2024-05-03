@@ -301,10 +301,7 @@ def main():
         elif input_option == 'video':
             video_input(data_src)
         else:
-            # Executa a função camera_input quando o botão é clicado
-            if st.button("Abrir Câmera"):
-                camera_input()
-
+            camera_input() 
 
 if __name__ == "__main__":
     try:
