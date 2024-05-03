@@ -130,7 +130,7 @@ def video_input(data_src):
             st2_text.markdown(f"### **{width}**")
             st3_text.markdown(f"### **{fps:.2f}**")
             if class_name == '':
-                st4_text.markdown(f"### **Nenhum objeto detectado**")
+                st4_text.markdown(f"### Nenhum objeto detectado")
             else:
                 st4_text.markdown(f"### {class_name}")
 
@@ -212,37 +212,27 @@ def camera_input():
     st.header("Detecção em tempo real")
     st.write("Clique abaixo para iniciar a detecção")
 
+    output = st.empty()
     class ObjectDetector(VideoTransformerBase):
         def __init__(self):
             print("Inicializando o detector de objetos...")
             # Carregar o modelo YOLO
             self.model = load_model(cfg_model_path, 'cpu')
             print("Modelo carregado com sucesso.")
-
+        
         def transform(self, frame):
             print("Recebendo frame...")
-            # Converter o frame para uma imagem
-            img = Image.fromarray(frame)
-            # Executar detecção de objetos
-            results = self.model(img)
-            # Obter as detecções
-            detections = results.xyxy[0]
-            print("Detecções realizadas com sucesso.")
-
-            # Converter av.VideoFrame para um array NumPy
-            frame_array = frame.copy()
-
-            # Desenhar caixas delimitadoras e rótulos nas detecções
-            for detection in detections:
-                x1, y1, x2, y2, conf, class_id = [int(coord) for coord in detection[:6]]
-                label = f"{self.model.names[class_id]}: {conf:.2f}"
-                cv2.rectangle(frame_array, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                cv2.putText(frame_array, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-
-            return frame_array
+            #enviando para infer image
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            output_img, class_name, _ = infer_image(frame)
+            output.image(output_img)
+            curr_time = time.time()
+            fps = 1 / (curr_time - prev_time)
+            prev_time = curr_time
+            return output
 
     # Iniciar a captura de vídeo da câmera
-    with st.camera_input(label="Pressione 'Iniciar' para abrir a câmera") as video_stream:
+    with st.camera_input(label="detecção em tempo real") as video_stream:
         if video_stream:
             object_detector = ObjectDetector()
 
