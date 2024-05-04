@@ -138,22 +138,18 @@ def video_input(data_src):
 
 def infer_image(img, size=None):
     model.conf = confidence
-    # Convertendo a imagem para o formato correto (array numpy)
-    img = np.array(img)
-    # Pré-processando a imagem conforme necessário (redimensionamento, normalização, etc.)
-    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # Convertendo de RGB para BGR (padrão OpenCV)
     result = model(img, size=size) if size else model(img)
 
     global global_ids_list
 
     list_ = []
     for index, row in result.pandas().xyxy[0].iterrows():
-        x1 = int(row['xmin'])
-        y1 = int(row['ymin'])
-        x2 = int(row['xmax'])
-        y2 = int(row['ymax'])
-        b = str(row['name'])
-        list_.append([x1, y1, x2, y2])
+        x1=int(row['xmin']) 
+        y1=int(row['ymin'])
+        x2=int(row['xmax'])
+        y2=int(row['ymax'])
+        b=str(row['name'])
+        list_.append([x1,y1,x2,y2])
 
     boxes_ids = tracker.update(list_)
     global_ids_list.extend([box_id[-1] for box_id in boxes_ids])
@@ -164,18 +160,21 @@ def infer_image(img, size=None):
 
     object_classes = {}
     for detection in result.xyxy[0]:
-        class_index = int(detection[5])
-        class_name = class_names[class_index]
-        object_classes[class_name] = object_classes.get(class_name, 0) + 1
+        class_index = int(detection[5]) 
+        class_name = class_names[class_index]  
+        object_classes[class_name] = object_classes.get(class_name, 0) + 1 
 
     class_names_list = list(object_classes.keys())
     counts_list = list(object_classes.values())
 
-    for i in range(len(class_names_list)):
+    for  i in range(len(class_names_list)):
         class_names_list[i] += " " + str(counts_list[i]) + str("\n")
-
+    
     class_names_result = "\n".join(class_names_list)
+    
+ 
 
+    
     return image, class_names_result, global_ids_list
     
 
