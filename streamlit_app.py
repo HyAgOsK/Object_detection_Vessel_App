@@ -208,7 +208,7 @@ def get_user_model():
 
     return model_file
 
-def camera_input():
+def camera():
     st.title('Oi teste detecção tempo real')
     picture = st.camera_input(label="detecção em tempo real")
    
@@ -266,7 +266,7 @@ def main():
         elif input_option == 'video':
             video_input(data_src)
         else:
-            camera_input() 
+            camera() 
 
 if __name__ == "__main__":
     try:
