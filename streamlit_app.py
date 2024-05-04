@@ -210,7 +210,11 @@ def get_user_model():
 
 def camera_input():
     st.title('Oi teste detecção tempo real')
-    st.camera_input(label="detecção em tempo real")
+    picture = st.camera_input(label="detecção em tempo real")
+    detection, class_name, _ = infer_image(picture)
+    st.image(detection, caption="Predição da imagem")
+    st.text(f'classes detectadas {class_name}')
+    
 
 def main():
     global model, confidence, cfg_model_path
