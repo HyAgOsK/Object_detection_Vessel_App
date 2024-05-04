@@ -209,25 +209,8 @@ def get_user_model():
     return model_file
 
 def camera_input():
-
-    # Inicializar a lista de IDs globais
-    global_ids_list = []
-
-    # Iniciar a captura de vídeo da câmera
-    with st.camera_input(label="detecção em tempo real") as video_stream:
-        if video_stream:
-            st.write("Câmera iniciada")
-            
-            # Loop para processar os frames da câmera
-            for frame in video_stream:
-                st.write("Recebendo frame")
-                
-                # Realizar a detecção de objetos em cada frame
-                processed_frame, class_name_result, global_ids_list = infer_image(frame)
-                
-                # Exibir o frame processado
-                st.image(processed_frame, channels="BGR")
-                st.text(class_name_result)
+    st.title('Oi teste detecção tempo real')
+    st.camera_input(label="detecção em tempo real")
 
 def main():
     global model, confidence, cfg_model_path
