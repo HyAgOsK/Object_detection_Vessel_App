@@ -211,9 +211,11 @@ def get_user_model():
 def camera_input():
     st.title('Oi teste detecção tempo real')
     picture = st.camera_input(label="detecção em tempo real")
-    detection, class_name, _ = infer_image(picture)
-    st.image(detection, caption="Predição da imagem")
-    st.text(f'classes detectadas {class_name}')
+   
+    if picture:
+         img, class_name, id = infer_image(picture)
+         st.image(img, caption=f"Predição da imagem - classe {class_name} - {id}")
+        
     
 
 def main():
