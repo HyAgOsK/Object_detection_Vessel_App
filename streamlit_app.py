@@ -11,7 +11,6 @@ import av
 import numpy as np
 
 
-st.set_page_config(page_title="Detection Vessel", page_icon=":anchor:")
 
 from streamlit_webrtc import (
     WebRtcMode,
@@ -268,6 +267,7 @@ def main():
 
 if __name__ == "__main__":
     try:
+        st.set_page_config(page_title="Detection Vessel", page_icon=":anchor:")
         main()
     except SystemExit:
         pass
