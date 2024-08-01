@@ -22,7 +22,8 @@ from streamlit_webrtc import (
 
 
 
-st.set_page_config(layout="wide")
+st.set_page_config(layout="wide", page_title="Detection Vessel", page_icon=":anchor:")
+
 st.markdown(
     """
     <style>
@@ -267,7 +268,6 @@ def main():
 
 if __name__ == "__main__":
     try:
-        st.set_page_config(page_title="Detection Vessel", page_icon=":anchor:")
         main()
     except SystemExit:
         pass
