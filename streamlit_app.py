@@ -37,6 +37,7 @@ tracker = Tracker()
 global_ids_list = []
 frame = 0
 fps = 0
+prev_time = time.time()
 
 def image_input(data_src):
     st.markdown("### Detecção de embarcações em imagens")
@@ -106,7 +107,6 @@ def video_input(data_src):
 
         st.markdown("---")
         output = st.empty()
-        prev_time = 0
         curr_time = 0
         while True:
             ret, frame = cap.read()
@@ -119,7 +119,6 @@ def video_input(data_src):
             output.image(output_img)
             curr_time = time.time()
             fps = 1 / (curr_time - prev_time)
-            prev_time = curr_time
             st1_text.markdown(f"### **{height}**")
             st2_text.markdown(f"### **{width}**")
             st3_text.markdown(f"### **{fps:.2f}**")
