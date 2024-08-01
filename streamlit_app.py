@@ -80,7 +80,7 @@ def video_input(data_src):
 
     vid_file = None
     if data_src == 'Dado de amostra':
-        vid_file = "data/sample_videos/yacht2.mp4"
+        vid_file = "data/uploaded_data/upload.mp4"
     else:
         vid_bytes = st.sidebar.file_uploader("Fazer upload de um vídeo", type=['mp4', 'mpv', 'avi'])
         if vid_bytes:
