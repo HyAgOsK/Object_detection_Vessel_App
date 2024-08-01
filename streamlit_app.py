@@ -9,6 +9,9 @@ import time
 from tracker import *
 import av
 
+st.set_page_config(page_title="Detection Vessel 📍", page_icon=":anchor:")
+
+
 from streamlit_webrtc import (
     WebRtcMode,
     ClientSettings,
