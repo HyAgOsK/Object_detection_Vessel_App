@@ -9,6 +9,9 @@ import time
 from tracker import *
 import av
 import numpy as np
+
+
+
 from streamlit_webrtc import (
     WebRtcMode,
     ClientSettings,
@@ -17,27 +20,30 @@ from streamlit_webrtc import (
     VideoTransformerBase
 )
 
+curr_time = time.time()
+
+
 st.set_page_config(layout="wide", page_title="Detection Vessel", page_icon=":anchor:")
 
 st.markdown(
     """
     <style>
+  
         p{
             font-size: 22px;
         }
+
     </style>
     """,
     unsafe_allow_html=True
 )
+
 
 cfg_model_path = 'models/best.pt'
 model = None
 confidence = .25
 tracker = Tracker()
 global_ids_list = []
-frame = 0
-fps = 0
-prev_time = time.time()
 
 def image_input(data_src):
     st.markdown("### Detecção de embarcações em imagens")
@@ -53,6 +59,8 @@ def image_input(data_src):
             img_file = "data/uploaded_data/upload." + img_bytes.name.split('.')[-1]
             Image.open(img_bytes).save(img_file)
 
+    
+
     if img_file:
         col1, col2 = st.columns(2)
         with col1:
@@ -66,9 +74,9 @@ def image_input(data_src):
                 st.markdown(f'### Objetos detectados:\n {class_name}')
                 st.markdown(f'Total de objetos: {len(id)}')
 
-def video_input(data_src):
-    global frame, fps
+                
 
+def video_input(data_src):
     st.markdown("### Detecção de embarcações em vídeo")
 
     vid_file = None
@@ -90,6 +98,7 @@ def video_input(data_src):
             width = st.sidebar.number_input("Width", min_value=120, step=20, value=width)
             height = st.sidebar.number_input("Height", min_value=120, step=20, value=height)
 
+        fps = 0
         class_name = 0
         st1, st2, st3, st4 = st.columns(4)
         with st1:
@@ -107,7 +116,7 @@ def video_input(data_src):
 
         st.markdown("---")
         output = st.empty()
-        curr_time = 0
+        prev_time = 0
         while True:
             ret, frame = cap.read()
             if not ret:
@@ -117,7 +126,7 @@ def video_input(data_src):
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             output_img, class_name, _ = infer_image(frame)
             output.image(output_img)
-            curr_time = time.time()
+            prev_time = time.time()
             fps = 1 / (curr_time - prev_time)
             st1_text.markdown(f"### **{height}**")
             st2_text.markdown(f"### **{width}**")
@@ -165,7 +174,11 @@ def infer_image(img, size=None):
     
     class_names_result = "\n".join(class_names_list)
     
+ 
+
+    
     return image, class_names_result, global_ids_list
+    
 
 @st.cache_resource
 def load_model(path, device):
@@ -173,9 +186,11 @@ def load_model(path, device):
     model_.to(device)
     return model_
 
+
 def download_model(url):
     model_file = wget.download(url, out="models")
     return model_file
+
 
 def get_user_model():
     model_src = st.sidebar.radio("Tipo", ["Enviar arquivo", "url"])
@@ -198,6 +213,7 @@ def get_user_model():
 def camera():
     st.title('Oi teste detecção tempo real')
     st.camera_input(label="detecção em tempo real")
+
 
 def main():
     global model, confidence, cfg_model_path
@@ -247,7 +263,7 @@ def main():
         elif input_option == 'video':
             video_input(data_src)
         else:
-            camera()
+            camera() 
 
 if __name__ == "__main__":
     try:
