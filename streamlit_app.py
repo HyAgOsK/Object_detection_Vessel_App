@@ -8,9 +8,10 @@ import os
 import time
 from tracker import *
 import av
+import numpy as np
 
-st.set_page_config(page_title="Detection Vessel 📍", page_icon=":anchor:")
 
+st.set_page_config(page_title="Detection Vessel", page_icon=":anchor:")
 
 from streamlit_webrtc import (
     WebRtcMode,
@@ -19,7 +20,6 @@ from streamlit_webrtc import (
     RTCConfiguration,
     VideoTransformerBase
 )
-import numpy as np
 
 
 
